@@ -1,0 +1,6 @@
+[submodule "lib/enet-socks5"]
+	path = lib/enet-socks5
+	url = https://github.com/zKevz/enet-socks5.git
+[submodule "lib/cpr"]
+	path = lib/cpr
+	url = https://github.com/libcpr/cpr.git
