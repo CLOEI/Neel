@@ -13,5 +13,6 @@ struct LoginData {
   string Mac;
   string Wk;
   string Hash;
-  string Rid;  
+  string Rid;
+  string Country = "id";
 };

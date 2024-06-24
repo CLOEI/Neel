@@ -1,7 +1,6 @@
 #ifndef CONNECT_H
 #define CONNECT_H
 
-#include "logindata.hpp"
 #include <map>
 #include <string>
 
@@ -15,7 +14,6 @@ class Connect {
     void ParseServerData(std::string& data);
   public:
     std::map<std::string, std::string> ServerData;
-    LoginData loginData;
 };
 
 #endif

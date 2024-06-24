@@ -4,10 +4,7 @@
 #include <cpr/cpr.h>
 #include "../packet/handler.hpp"
 
-Connect::Connect(std::string ID, std::string password) {
-  loginData.ID = ID;
-  loginData.Password = password;
-}
+Connect::Connect(std::string ID, std::string password) {}
 
 void Connect::Run() {
   HTTP();
