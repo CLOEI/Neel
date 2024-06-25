@@ -1,9 +1,9 @@
 #pragma once
 
 #include "bot.hpp"
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 class Manager {
   public:
@@ -11,5 +11,5 @@ class Manager {
     std::shared_ptr<Bot> Get(std::string ID);
     void Remove(std::string ID);
   public:
-    std::map<std::string, std::unique_ptr<Bot>> bots;
+    std::unordered_map<std::string, std::shared_ptr<Bot>> bots;
 };

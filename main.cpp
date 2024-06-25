@@ -1,7 +1,9 @@
-#include "connect/connect.hpp"
+#include "bot/manager.hpp"
 
 int main() {
-  Connect connection("ID", "password");
-  connection.Run();
+  Manager manager{};
+  manager.Add("Cupcake");
+
+  while (true) {}
   return 0;
 }

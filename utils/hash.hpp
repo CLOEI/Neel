@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdint>
 #include <string>
 #include <openssl/evp.h>
 
@@ -17,14 +18,35 @@ namespace Utils {
         EVP_MD_CTX_free(ctx);
 
         char sha256string[65];
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < digest_len; i++) {
           sprintf(&sha256string[i * 2], "%02x", (unsigned int)digest[i]);
         }
-        sha256string[64] = '\0';
+        sha256string[digest_len * 2] = '\0';
 
         std::string hash = std::string(sha256string);
         std::transform(hash.begin(), hash.end(), hash.begin(), ::toupper);
         return hash;
+      }
+
+      // https://github.com/SethRobinson/proton
+      static uint32_t HashString(const char *str, int32_t len) {
+        if (!str) return 0;
+
+        unsigned char *n = (unsigned char *) str;
+        uint32_t acc = 0x55555555;
+
+        if (len == 0)
+        {
+          while (*n)
+            acc = (acc >> 27) + (acc << 5) + *n++;
+        } else
+        {
+          for (uint32_t i=0; i < len; i++)
+          {
+            acc = (acc >> 27) + (acc << 5) + *n++;
+          }
+        }
+        return acc;
       }
 
       static std::string md5(const std::string& input) {

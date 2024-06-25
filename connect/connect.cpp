@@ -2,20 +2,23 @@
 #include <enet/enet.h>
 #include <spdlog/spdlog.h>
 #include <cpr/cpr.h>
+#include <string>
+#include <thread>
 #include "../packet/handler.hpp"
 
-Connect::Connect(std::string ID, std::string password) {}
-
-void Connect::Run() {
+void Connect::Thread(std::shared_ptr<spdlog::logger> logger) {
+  this->logger = logger;
+  isRunning = true;
   HTTP();
+  t = std::move(std::thread(&Connect::Event, this));
 }
 
 void Connect::HTTP() {
-  spdlog::info("Getting data from server...");
+  logger->info("Getting data from server...");
   cpr::Response r = cpr::Post(cpr::Url("https://www.growtopia1.com/growtopia/server_data.php"), cpr::Header{{"Content-Type", "application/x-www-form-urlencoded"},{"User-Agent", "UbiServices_SDK_2022.Release.9_PC64_ansi_static"}}, cpr::Payload{});
   ParseServerData(r.text);
   if (ServerData.find("maint") != ServerData.end()) {
-    spdlog::error("Server is under maintenance");
+    logger->error("Server is under maintenance");
     return;
   }
   ENet();
@@ -23,11 +26,11 @@ void Connect::HTTP() {
 
 void Connect::ENet() {
   if (enet_initialize() < 0) {
-    spdlog::error("ENet failed to initialize");
+    logger->error("ENet failed to initialize");
     return;
   }
-  spdlog::info("Connecting to {} on port {}", ServerData["server"], ServerData["port"]);
-  ENetHost* client = enet_host_create(nullptr, 1, 2, 0, 0);
+  logger->info("Connecting to {} on port {}", ServerData["server"], ServerData["port"]);
+  client = enet_host_create(nullptr, 1, 2, 0, 0);
   if (client == nullptr) {
     spdlog::error("ENet failed to create client");
     return;
@@ -38,26 +41,27 @@ void Connect::ENet() {
 
   ENetAddress address;
   if (enet_address_set_host_ip(&address, ServerData["server"].c_str()) != 0) {
-    spdlog::error("ENet failed to set host IP, retrying...");
+    logger->error("ENet failed to set host IP, retrying...");
     HTTP();
     return;
   }
   address.port = stoi(ServerData["port"]);
-
   ENetPeer *peer = enet_host_connect(client, &address, 2, 0);
-  ENetEvent event;
+}
 
-  while (true) {
+void Connect::Event() {
+  ENetEvent event;
+  while (isRunning) {
     while (enet_host_service(client, &event, 100) > 0) {
       switch (event.type) {
         case ENET_EVENT_TYPE_CONNECT:
-          spdlog::info("Connected to server");
+          logger->info("Connected to server");
           break;
         case ENET_EVENT_TYPE_RECEIVE:
           Packet::Handler(event.packet);
           break;
         case ENET_EVENT_TYPE_DISCONNECT:
-          spdlog::info("Disconnected from server, reconnecting...");
+          logger->info("Disconnected from server, reconnecting...");
           HTTP();
           break;
         case ENET_EVENT_TYPE_NONE:
