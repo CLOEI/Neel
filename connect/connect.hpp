@@ -12,16 +12,16 @@ class Connect {
   public:
     void HTTP();
     void ENet();
-    void Event();
-    void Thread(std::shared_ptr<spdlog::logger> logger);
+    void Run(std::shared_ptr<spdlog::logger> logger);
   private:
     void ParseServerData(std::string& data);
   public:
     std::map<std::string, std::string> ServerData;
     std::shared_ptr<spdlog::logger> logger;
-    std::thread t;
+    std::thread connect_thread;
     bool isRunning;
     ENetHost* client;
+    ENetPeer* peer;
 };
 
 #endif

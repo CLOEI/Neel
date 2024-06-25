@@ -1,8 +1,9 @@
+#include <spdlog/spdlog.h>
+#include <string>
 #include "bot.hpp"
 #include "../utils/random.hpp"
 #include "../utils/hash.hpp"
-#include <spdlog/spdlog.h>
-#include <string>
+#include "../packet/handler.hpp"
 
 using namespace Utils;
 using namespace std;
@@ -18,8 +19,32 @@ Bot::Bot(shared_ptr<spdlog::logger> logger, string ID, string password) {
 
 void Bot::Start() {
   isRunning = true;
-  Connect::Thread(logger);
-  t = std::move(thread(&Bot::Thread, this));
+  Run(logger);
+  connect_thread = std::move(std::thread(&Bot::Event, this));
+  bot_thread = std::move(thread(&Bot::Thread, this));
+}
+
+void Bot::Event() {
+  ENetEvent event;
+  Packet::Handler packet(logger, this);
+  while (isRunning) {
+    while (enet_host_service(client, &event, 100) > 0) {
+      switch (event.type) {
+        case ENET_EVENT_TYPE_CONNECT:
+          logger->info("Connected to server");
+          break;
+        case ENET_EVENT_TYPE_RECEIVE:
+          packet.Handle(event.packet);
+          break;
+        case ENET_EVENT_TYPE_DISCONNECT:
+          logger->info("Disconnected from server, reconnecting...");
+          HTTP();
+          break;
+        case ENET_EVENT_TYPE_NONE:
+          break;
+      }
+    }
+  }
 }
 
 void Bot::Thread() {

@@ -3,14 +3,10 @@
 #include <spdlog/spdlog.h>
 #include <cpr/cpr.h>
 #include <string>
-#include <thread>
-#include "../packet/handler.hpp"
 
-void Connect::Thread(std::shared_ptr<spdlog::logger> logger) {
+void Connect::Run(std::shared_ptr<spdlog::logger> logger) {
   this->logger = logger;
-  isRunning = true;
   HTTP();
-  t = std::move(std::thread(&Connect::Event, this));
 }
 
 void Connect::HTTP() {
@@ -46,29 +42,7 @@ void Connect::ENet() {
     return;
   }
   address.port = stoi(ServerData["port"]);
-  ENetPeer *peer = enet_host_connect(client, &address, 2, 0);
-}
-
-void Connect::Event() {
-  ENetEvent event;
-  while (isRunning) {
-    while (enet_host_service(client, &event, 100) > 0) {
-      switch (event.type) {
-        case ENET_EVENT_TYPE_CONNECT:
-          logger->info("Connected to server");
-          break;
-        case ENET_EVENT_TYPE_RECEIVE:
-          Packet::Handler(event.packet);
-          break;
-        case ENET_EVENT_TYPE_DISCONNECT:
-          logger->info("Disconnected from server, reconnecting...");
-          HTTP();
-          break;
-        case ENET_EVENT_TYPE_NONE:
-          break;
-      }
-    }
-  }
+  peer = enet_host_connect(client, &address, 2, 0);
 }
 
 void Connect::ParseServerData(std::string& data) {
