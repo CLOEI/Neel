@@ -1,4 +1,5 @@
 #include "data.hpp"
+#include "enet/enet.h"
 #include <spdlog/spdlog.h>
 #include <string>
 
@@ -31,4 +32,11 @@ std::string Data::Name() {
       return "UNKNOWN PACKET TYPE";
       break;
   }
+}
+
+ENetPacket* Data::Create(ePacketType type, std::string data) {
+  ENetPacket* pkt = enet_packet_create(nullptr, sizeof(ePacketType) + data.length() + 1, ENET_PACKET_FLAG_RELIABLE);
+  *(ePacketType*)pkt->data = ePacketType::NET_MESSAGE_GENERIC;
+  memcpy(pkt->data + sizeof(ePacketType), data.c_str(), data.length());
+  return pkt;
 }

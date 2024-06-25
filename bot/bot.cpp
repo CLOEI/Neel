@@ -3,6 +3,7 @@
 #include "bot.hpp"
 #include "../utils/random.hpp"
 #include "../utils/hash.hpp"
+#include "../utils/klv.hpp"
 #include "../packet/handler.hpp"
 
 using namespace Utils;
@@ -53,11 +54,16 @@ void Bot::Thread() {
   }
 }
 
+void Bot::SendPacket(ENetPacket* packet) {
+  enet_peer_send(peer, 0, packet);
+}
+
 void Bot::Spoof() {
   loginData.Mac = Random::MAC();
   loginData.Wk = Random::HEX(32);
   loginData.Rid = Random::HEX(32);
   loginData.Hash = to_string(Hash::HashString(fmt::format("{}RT", loginData.Mac).c_str(), 0));
   loginData.Hash2 = to_string(Hash::HashString(fmt::format("{}RT", Random::HEX(16)).c_str(), 0));
-  logger->info("Spoofed data: Mac: {}, Wk: {}, Rid: {}, Hash: {}, Hash2: {}", loginData.Mac, loginData.Wk, loginData.Rid, loginData.Hash, loginData.Hash2);
+  loginData.klv = Utils::generate_klv(std::stoi(loginData.GameProtocol), loginData.GameVersion, loginData.Rid);
+  logger->info("Spoofed data: Mac: {}, Wk: {}, Rid: {}, Hash: {}, Hash2: {}, KLV: {}", loginData.Mac, loginData.Wk, loginData.Rid, loginData.Hash, loginData.Hash2, loginData.klv);
 }

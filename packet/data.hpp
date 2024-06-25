@@ -18,6 +18,7 @@ namespace Packet {
     public:
       Data(ENetPacket* packet);
       std::string Name();
+      static ENetPacket* Create(ePacketType type, std::string data); 
     public:
       ePacketType Type;
   };

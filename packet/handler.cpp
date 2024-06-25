@@ -1,10 +1,8 @@
 #include "handler.hpp"
 #include <enet/enet.h>
-#include <iostream>
 #include <spdlog/spdlog.h>
-#include <string.h>
 #include <string>
-#include "../utils/klv.hpp"
+#include "../utils/textparse.hpp"
 #include "data.hpp"
 #include <memory>
 
@@ -39,13 +37,10 @@ void Handler::Handle(ENetPacket* packet) {
       login.add("zf", "493085170");
       login.add("deviceVersion", "0");
       login.add("platformID", "0,1,1");
-      login.add("klv", Utils::generate_klv(std::stoi(bot->loginData.GameProtocol), bot->loginData.GameVersion, bot->loginData.Rid));
-
-      ENetPacket* pkt = enet_packet_create(nullptr, sizeof(ePacketType::NET_MESSAGE_GENERIC) + login.Text.length() + 1, ENET_PACKET_FLAG_RELIABLE);
-      *(ePacketType*)pkt->data = ePacketType::NET_MESSAGE_GENERIC;
-      memcpy(pkt->data + sizeof(ePacketType), login.Text.c_str(), login.Text.length());
+      login.add("klv", bot->loginData.klv);
+      
       logger->info("Sending login packet to server");
-      enet_peer_send(bot->peer, 0, pkt);
+      bot->SendPacket(Data::Create(NET_MESSAGE_GENERIC, login.Text));
       break;
     }
     case NET_MESSAGE_GENERIC:

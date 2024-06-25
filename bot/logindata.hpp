@@ -16,4 +16,5 @@ struct LoginData {
   string Hash2;
   string Rid;
   string Country = "id";
+  string klv;
 };

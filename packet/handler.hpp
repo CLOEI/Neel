@@ -5,7 +5,6 @@
 #include <memory>
 #include <spdlog/spdlog.h>
 #include "../bot/bot.hpp"
-#include "../utils/textparse.hpp"
 #include "spdlog/logger.h"
 
 namespace Packet {

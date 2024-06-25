@@ -13,6 +13,7 @@ class Bot: public Connect {
     void Event();
     void Thread();
     void Spoof();
+    void SendPacket(ENetPacket* packet);
   public:
     std::shared_ptr<spdlog::logger> logger;
     LoginData loginData;
