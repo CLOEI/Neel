@@ -11,9 +11,11 @@ using namespace std;
 
 Bot::Bot(shared_ptr<spdlog::logger> logger, string ID, string password) {
   this->logger = logger;
-  loginData.ID = ID;
-  loginData.Password = password;
-  if (password.empty()) {}
+  if (!password.empty()) {
+    loginData.tankIDName = ID;
+    loginData.tankIDPass = password;
+  }
+  loginData.RequestedName = ID;
   Spoof();
   Start();
 }

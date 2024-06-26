@@ -7,6 +7,10 @@
 
 using namespace std;
 
+Manager::Manager() {
+  // Init item database
+}
+
 shared_ptr<Bot> Manager::Add(string ID, string password) {
   auto logger = spdlog::stdout_color_mt(ID);
   logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%^%l%$] %v");

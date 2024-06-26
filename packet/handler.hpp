@@ -1,6 +1,5 @@
 #pragma once
 
-#include "data.hpp"
 #include <enet/enet.h>
 #include <memory>
 #include <spdlog/spdlog.h>

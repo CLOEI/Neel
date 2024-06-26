@@ -2,7 +2,7 @@
 
 int main() {
   Manager manager{};
-  manager.Add("Cupcake");
+  manager.Add("JoyBad");
 
   while (true) {}
   return 0;

@@ -8,4 +8,5 @@ This document my process of learning C++ programming language from another langu
 In this project, I aim to develop a bot that can automate certain tasks in Growtopia using C++ programming language. This project serves as a learning experience in no way I am promoting cheating in the game.
 
 
-
+## CREDIT :
+[Badewen](https://github.com/badewen/) - For item parser and inspiration for this project.

@@ -13,3 +13,4 @@ add_subdirectory(lib/spdlog)
 add_executable(Neel main.cpp packet/data.cpp connect/connect.cpp bot/bot.cpp bot/manager.cpp packet/handler.cpp)
 
 target_link_libraries(Neel enet cpr::cpr spdlog::spdlog ${OPENSSL_LIBRARIES})
+FILE(COPY items.dat DESTINATION ${CMAKE_BINARY_DIR})

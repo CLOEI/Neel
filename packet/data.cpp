@@ -1,5 +1,8 @@
 #include "data.hpp"
 #include "enet/enet.h"
+#include <iostream>
+#include <memory>
+#include <ostream>
 #include <spdlog/spdlog.h>
 #include <string>
 
@@ -7,11 +10,22 @@ using namespace Packet;
 
 Data::Data(ENetPacket* packet) {
   if (packet->dataLength < 5) {
-    spdlog::error("Packet is too small");
-    return;
+        return;
   }
 
   Type = *(ePacketType*)packet->data;
+
+  if (Type != ePacketType::NET_MESSAGE_GAME_MESSAGE) {
+      TextPkt = std::make_unique<std::string>(packet->data + sizeof(ePacketType), packet->data + packet->dataLength - 1);
+  } else {
+      TankPacket* tank = (TankPacket*)packet->data;
+      std::cout << "Tank type " << (int)tank->Type << std::endl;
+  };
+}
+
+Data::~Data() {
+  TextPkt.release();
+  Type = ePacketType::NET_MESSAGE_UNKNOWN;
 }
 
 std::string Data::Name() {
@@ -26,8 +40,8 @@ std::string Data::Name() {
       return "NET_MESSAGE_GAME_TANK";
     case NET_MESSAGE_PACKET_FIVE:
       return "NET_MESSAGE_PACKET_FIVE";
-    case NET_MESSAGE_PACKET_SIX:
-      return "NET_MESSAGE_PACKET_SIX";
+    case NET_MESSAGE_GAME_EVENT:
+      return "NET_MESSAGE_GAME_EVENT";
     default:
       return "UNKNOWN PACKET TYPE";
       break;

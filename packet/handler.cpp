@@ -1,5 +1,7 @@
 #include "handler.hpp"
+#include <cstdint>
 #include <enet/enet.h>
+#include <iostream>
 #include <spdlog/spdlog.h>
 #include <string>
 #include "../utils/textparse.hpp"
@@ -20,7 +22,7 @@ void Handler::Handle(ENetPacket* packet) {
     case NET_MESSAGE_HELLO: {
       Utils::TextParse login(fmt::format("mac|{}", bot->loginData.Mac));
 
-      login.add("requestedName", "BraveDuck");
+      login.add("requestedName", bot->loginData.RequestedName);
       login.add("hash2", bot->loginData.Hash2);
       login.add("hash", bot->loginData.Hash);
       login.add("country", bot->loginData.Country);
@@ -28,16 +30,21 @@ void Handler::Handle(ENetPacket* packet) {
       login.add("rid", bot->loginData.Rid);
       login.add("game_version", bot->loginData.GameVersion);
       login.add("protocol", bot->loginData.GameProtocol);
-      login.add("GDPR", "1");
-      login.add("player_age", "25");
-      login.add("total_playtime", "0");
-      login.add("category", "_-5100");
-      login.add("fhash", "-716928004");
-      login.add("lmode", "0");
-      login.add("zf", "493085170");
-      login.add("deviceVersion", "0");
-      login.add("platformID", "0,1,1");
+      login.add("GDPR", bot->loginData.GDPR);
+      login.add("player_age", bot->loginData.PlayerAge);
+      login.add("total_playtime", bot->loginData.TotalPlaytime);
+      login.add("category", bot->loginData.Category);
+      login.add("fhash", bot->loginData.Fhash);
+      login.add("lmode", bot->loginData.Lmode);
+      login.add("zf", bot->loginData.Zf);
+      login.add("deviceVersion", bot->loginData.DeviceVersion);
+      login.add("platformID", bot->loginData.PlatformID);
       login.add("klv", bot->loginData.klv);
+
+      if (!bot->loginData.tankIDName.empty()) {
+        login.add("tankIDName", bot->loginData.tankIDName);
+        login.add("tankIDPass", bot->loginData.tankIDPass);
+      }
       
       logger->info("Sending login packet to server");
       bot->SendPacket(Data::Create(NET_MESSAGE_GENERIC, login.Text));
@@ -45,14 +52,20 @@ void Handler::Handle(ENetPacket* packet) {
     }
     case NET_MESSAGE_GENERIC:
       break;
-    case NET_MESSAGE_GAME_MESSAGE:
-      break;
+    case NET_MESSAGE_GAME_MESSAGE: {
+      // logger->info("Tank type {}", (int)data.TankPkt->Header.Type);
+
+      break;  
+    }
     case NET_MESSAGE_GAME_TANK:
       break;
     case NET_MESSAGE_PACKET_FIVE:
       break;
-    case NET_MESSAGE_PACKET_SIX:
+    case NET_MESSAGE_GAME_EVENT: {
+      packet->data[packet->dataLength - 1] = '\0';
+      logger->info("{}", (char*)(packet->data + sizeof(uint32_t)));
       break;
+    }
     default:
       break;
   }
