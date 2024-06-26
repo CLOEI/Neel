@@ -3,12 +3,13 @@
 #include "logindata.hpp"
 #include <enet/enet.h>
 #include <memory>
-#include "../connect/connect.hpp"
 #include "spdlog/logger.h"
+#include "../connect/connect.hpp"
+#include "../itemdat/itemdat.hpp"
 
 class Bot: public Connect {
   public:
-    Bot(std::shared_ptr<spdlog::logger> logger, string ID, string password = "");
+    Bot(std::shared_ptr<spdlog::logger> logger, shared_ptr<Itemdat> items_data, string ID, string password = "");
     void Start();
     void Event();
     void Thread();
@@ -16,6 +17,7 @@ class Bot: public Connect {
     void SendPacket(ENetPacket* packet);
   public:
     std::shared_ptr<spdlog::logger> logger;
+    shared_ptr<Itemdat> items_data;
     LoginData loginData;
     std::thread bot_thread;
 };

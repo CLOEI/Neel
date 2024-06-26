@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include "../itemdat/itemdat.hpp"
+
 
 class Manager {
   public:
@@ -13,4 +15,5 @@ class Manager {
     void Remove(std::string ID);
   public:
     std::unordered_map<std::string, std::shared_ptr<Bot>> bots;
+    std::shared_ptr<Itemdat> items_data;
 };

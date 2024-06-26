@@ -1,3 +1,4 @@
+#include <memory>
 #include <spdlog/spdlog.h>
 #include <string>
 #include "bot.hpp"
@@ -9,8 +10,9 @@
 using namespace Utils;
 using namespace std;
 
-Bot::Bot(shared_ptr<spdlog::logger> logger, string ID, string password) {
+Bot::Bot(shared_ptr<spdlog::logger> logger, shared_ptr<Itemdat> items_data, string ID, string password) {
   this->logger = logger;
+  this->items_data = items_data;
   if (!password.empty()) {
     loginData.tankIDName = ID;
     loginData.tankIDPass = password;
